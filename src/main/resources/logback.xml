@@ -1,0 +1,10 @@
+<configuration>
+    <appender name="CLOUD" class="com.google.cloud.logging.logback.LoggingAppender">
+        <log>request.echo.application</log>
+        <resourceType>gae_app</resourceType>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CLOUD" />
+    </root>
+</configuration>
