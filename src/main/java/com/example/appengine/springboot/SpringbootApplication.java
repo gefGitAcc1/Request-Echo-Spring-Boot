@@ -17,6 +17,7 @@
 package com.example.appengine.springboot;
 
 // [START gae_java11_helloworld]
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -25,7 +26,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.UUID;
 
 @SpringBootApplication
 @RestController
@@ -38,20 +41,27 @@ public class SpringbootApplication {
   }
 
   @GetMapping("/*")
-  public void hello(HttpServletRequest request) {
-    log(String.format("Path Info : '%s'", request.getPathInfo()));
-    log(String.format("URI : '%s'", request.getRequestURI()));
-    log(String.format("URL : '%s'", request.getRequestURL()));
+  public void hello(HttpServletRequest request) throws IOException {
+    String uuid = UUID.randomUUID().toString();
+
+    log(String.format("['%s'] START REQUEST", uuid));
+    log(String.format("['%s'] Path Info : '%s'", uuid, request.getPathInfo()));
+    log(String.format("['%s'] URI : '%s'", uuid, request.getRequestURI()));
+    log(String.format("['%s'] URL : '%s'", uuid, request.getRequestURL()));
 
     request.getHeaderNames().asIterator().forEachRemaining(
             hName -> request.getHeaders(hName).asIterator().forEachRemaining(
-                    header -> log(String.format("Header '%s' : '%s'", hName, header))
+                    header -> log(String.format("['%s'] Header '%s' : '%s'", uuid, hName, header))
             )
     );
 
     request.getParameterMap().entrySet().forEach(
-           e -> log(String.format("Parameter '%s' : '%s'", e.getKey(), Arrays.toString(e.getValue())))
+            e -> log(String.format("['%s'] Parameter '%s' : '%s'", uuid, e.getKey(), Arrays.toString(e.getValue())))
     );
+
+    String body = IOUtils.toString(request.getReader());
+    log(String.format("['%s'] Body : '%s'", uuid, body));
+    log(String.format("['%s'] END REQUEST", uuid));
   }
 
   private void log(String message) {
